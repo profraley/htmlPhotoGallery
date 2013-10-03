@@ -1,0 +1,209 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title>XMLHttpsRequest</title>
+
+	<link rel="stylesheet" href="css/style.css"/>
+	<script src="//ajax.googleapis.com/ajax/libs/jquery/1.7.1/jquery.min.js"></script>
+	<script type="text/javascript">
+		function makeImg(src) {
+			var img = document.createElement("img");
+			img.setAttribute("src", src);
+			img.setAttribute("height", "50%");
+			img.setAttribute("width", "50%");
+			return img;
+		}
+
+		function makeLabel(text) {
+			var p = document.createElement("p");
+			p.innerHTML = text;
+			return p;
+		}
+
+		function makeItem(src, text, div) {
+			$(div).addClass('photo');
+			var img = makeImg(src);
+			var p = makeLabel(text);
+			div.appendChild(img);
+			div.appendChild(p);
+			$(div).hide();
+			return div;
+		}
+
+		var c = 0;
+		function slideLeft(e) {
+			var photo = $('.photo').eq(mCurrentIndex);
+			var totalWidth = photo.outerWidth(true) + photo.offset().left;
+			photo.animate( {'left' : -totalWidth, 'width': 0});
+			mCurrentIndex++;
+		}
+
+		function slideRight(e) {
+			mCurrentIndex--;
+			var photo = $('.photo').eq(mCurrentIndex);
+			photo.animate( {'left' : 0, 'width' : 650});
+		}
+
+		var mCurrentIndex = 0;
+		var request = new XMLHttpRequest();
+		var mImages = new Array();
+
+		var url = 'http://lyle.smu.edu/~craley/3345/http/gallery/images.json';
+		request.open('GET', url, false);
+		request.send();
+
+
+		if (request.status === 200) {
+		  console.log(request.responseText);
+		  //document.write(request.responseText);
+		  var text = "";
+		  var gallery = JSON.parse(request.responseText);
+		  var div = document.createElement("div");
+		  var img;
+		  for(var i = 0, len = gallery.images.length; i < len; i++) {
+		  	    var image = gallery.images[i];
+		  	    if ( i < 1) {
+			  		img = makeItem(image.imgPath, image.description, div);
+			  		//div.appendChild(img);
+			  		img.firstChild.onload = function(e) {
+			  			mImages.push(e.target.cloneNode());
+			  			console.log("div img loaded @ " + mImages.length);
+			  			e.target.onload = null;
+			  			$(e.target).click( function() {
+			  				if ( this.style.width === '100%') {
+			  					$(this).animate( {'width' : '50%', 'height': '50%'}, 500);
+			  				} else {
+			  					$(this).animate( {'width' : '100%', 'height': '100%'}, 500);
+			  				}
+			  			});
+			  		};
+		  		} else { break;}
+
+		  		
+		  }
+
+		}
+
+		$(document).ready( function() {
+			// $(document.body).keyup( function(e) {
+			// 	console.log(e.which);
+			// 	if (e.which === 39 || e.which === 37) {
+			// 		var decrement = e.which === 39 ? 1 : -1;
+			// 		var map;
+			// 		mCurrentIndex += decrement;
+			// 		if (mCurrentIndex < 0) {
+						
+			// 			mCurrentIndex = mImages.length -1;
+			// 		} else if (mCurrentIndex >= mImages.length) {
+
+			// 			mCurrentIndex = 0;
+			// 		}
+			// 		map = { 'opacity' : '0', 'left' : '-1000px'};
+			// 		var img = $('img')[0];
+			// 		console.log('index = ' + mCurrentIndex);
+			// 		console.log('old src = ' + img.src)
+			// 		img.src = mImages[mCurrentIndex].src;
+			// 		console.log('new src = ' + img.src)
+			// 		$('p').eq(0).text(gallery.images[mCurrentIndex].description);
+			// 		$('div.photo').animate(map, 3000);
+			// 	} 
+			// });
+
+			$('.photo').css('opacity', '0');
+			$('.details').hide();
+
+		});
+
+		window.onload = function() {
+			// $('#gallery')[0].appendChild(div);	
+			// $(div).each( function() {
+			// 	$(this).fadeIn(3000);
+			// });
+			// for (var i = mImages.length, len = 2; i < len; i++) {
+	  // 			var image = gallery.images[i];
+	  // 			var temp = new Image();
+		 //  		temp.onload = function(e) {
+		 //  			mImages.push(e.target);
+		 //  			console.log("image loaded @ " + mImages.length);
+		 //  			e.target.onload = null;
+		 //  		};
+	  // 			temp.src = image.imgPath;
+			// }
+
+
+
+			
+			$('.thumbnail').each( function() {
+				$(this).width( $(this).width() * .12);		
+			});
+
+
+			$('.arrow').each( function() {
+				var left = ($(this).prev().width() - $(this).width()) / 2;
+				var top = $(this).prev().outerHeight(true) - $(this).outerHeight(true);
+				left = left + 'px';
+				top = top + 'px';
+				$(this).css( 'left', left);
+				$(this).css('top', top);
+			});
+
+			var totalWidth = 0;
+			$('.photo').each( function(i){
+				if ( i % 2 == 0) {
+					$(this).css('backgroundColor', 'white');
+				} else {
+					$(this).css('backgroundColor', 'black');
+				}
+				totalWidth += $(this).outerWidth(true);
+				$(this).css('opacity', '1');
+				
+			});
+			$('#gallery').width(totalWidth);
+			$('#leftSlider').click(slideLeft);
+			$('#rightSlider').click(slideRight);
+		}
+
+
+
+	</script>
+</head>
+<body>
+  <div id="gallery">
+  	<div class="photo">
+  		<img class="thumbnail" src="http://lyle.smu.edu/~craley/3345/img/italy/SAM_0944.JPG"/>
+  		<img class="arrow rot90" src="img/arrow.png"/>
+  		<div class="details">
+  			<p class="name">Photo 1</p>
+  			<p class="location">Location: Tom</p>
+  			<p class="description">Description: raw</p>
+  			<p class="date">Date: Paul</p>
+  		</div>
+  	</div>
+  	<div class="photo">
+  		<img class="thumbnail" src="http://lyle.smu.edu/~craley/3345/img/italy/SAM_1029.JPG">
+  		<img class="arrow rot90" src="img/arrow.png"/>
+  		<div class="details">
+  			<p class="name">Photo 1</p>
+  			<p class="location">Location: Tom</p>
+  			<p class="description">Description: raw</p>
+  			<p class="date">Date: Paul</p>
+  		</div>
+  	</div>
+  	<div class="photo">
+  		<img class='thumbnail' src="http://lyle.smu.edu/~craley/3345/img/italy/SAM_1016.JPG">
+  		<img class="arrow rot90" src="img/arrow.png"/>
+  		<div class="details">
+  			<p class="name">Photo 1</p>
+  			<p class="location">Location: Tom</p>
+  			<p class="description">Description: raw</p>
+  			<p class="date">Date: Paul</p>
+  		</div>
+  	</div>
+
+  </div>
+	<div id="nav">
+		<img id="leftSlider" class='rot180' src="img/arrow.png"/>
+		<img id="rightSlider" src="img/arrow.png"/>
+	</div>
+</body>
+</html>
