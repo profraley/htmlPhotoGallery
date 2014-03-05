@@ -42,14 +42,13 @@ function swapPhoto() {
 
 
 var mCurrentIndex = 0;
-var request = new XMLHttpRequest();
+var mRequest = new XMLHttpRequest();
 
 //Use this array to hold objects which contain the following:
 //location, description, date and an actual Image element.
 var mImages = [];
-var json;
-var url = 'insert_url_here_to_image_json';
-
+var mJson;
+var mUrl = 'insert_url_here_to_image_json';
 
 //This is probably seems confusing, but in javascript there is a concept known as closures. Closures allows
 //variables to remain in scope after a method finishes executing. You can read about it here: http://stackoverflow.com/a/2803496
@@ -92,6 +91,13 @@ $(document).ready( function() {
 window.addEventListener('load', function() {
 	console.log('window loaded');
 	testClosureExample();
+
 }, false);
 
-
+function GalleryImage() {
+	//implement me as an object to hold the following data about an image:
+	//1. location where photo was taken
+	//2. description of photo
+	//3. the date when the photo was taken
+	//4. an HTMLImageObject which will actually hold a bitmap of the photo. https://developer.mozilla.org/en-US/docs/Web/API/HTMLImageElement 
+}
